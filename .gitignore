@@ -1,0 +1,4 @@
+Manifest.toml
+/test/live/
+*.cov
+.DS_Store

@@ -1,0 +1,19 @@
+name = "GroqClient"
+uuid = "711eb22d-91dc-437e-b59a-359d7c588a21"
+authors = ["Yoni Nazarathy <yoni@accumulationpoint.com>"]
+version = "0.1.0"
+
+[deps]
+HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
+
+[compat]
+HTTP = "1"
+JSON3 = "1.14"
+julia = "1.10"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
