@@ -157,6 +157,27 @@ has_key(c)   # false
 Library code can degrade to identity passes / placeholders without a key.
 Calling `chat` on a keyless client throws — guard with `has_key`.
 
+## Health & speed probes
+
+`has_key` only tells you a key string is *set*, not that it works. Two live
+probes go further — both make minimal real calls (a few output tokens) and
+never throw:
+
+```julia
+hc = healthcheck(c)              # one minimal call, classified
+hc.ok, hc.status                 # e.g. (true, :ok) or (false, :billing)
+
+sp = speedtest(c; n = 5)         # n concurrent calls under the rpm cap
+sp.throughput_rps, sp.latency_median_ms
+```
+
+`healthcheck` returns a `HealthStatus` whose `status` is one of `:ok`,
+`:no_key`, `:auth`, `:quota`, `:billing`, `:bad_request`, `:server`,
+`:network`, `:error` — enough for a dashboard to show green/red and say *why*.
+`speedtest` returns a `SpeedResult` (ok / rate-limited / failed counts, achieved
+`throughput_rps`, and min/median/max latency). Both short-circuit on a keyless
+client.
+
 ## Testing
 
 ```bash
