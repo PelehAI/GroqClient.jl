@@ -135,3 +135,35 @@ using JSON3
         @test has_key(Client(api_key="")) == false
     end
 end
+
+@testset "GroqClient — health probe (offline)" begin
+    cls = GroqClient._health_status_from
+    @test cls(429, "") == :quota
+    @test cls(400, "RESOURCE_EXHAUSTED: quota exceeded") == :quota
+    @test cls(401, "unauthorized") == :auth
+    @test cls(403, "permission_denied") == :auth
+    @test cls(400, "API_KEY_INVALID: invalid api key") == :auth
+    @test cls(400, "credit balance is too low") == :billing
+    @test cls(402, "") == :billing
+    @test cls(400, "bad model id") == :bad_request
+    @test cls(503, "") == :server
+    @test cls(0, "connection refused") == :network
+    @test cls(418, "teapot") == :error
+
+    @test GroqClient._median_int(Int[]) == 0
+    @test GroqClient._median_int([5]) == 5
+    @test GroqClient._median_int([3, 1, 2]) == 2
+    @test GroqClient._median_int([2, 2, 4, 4]) == 3
+
+    h = healthcheck(Client(api_key=""))
+    @test h.ok == false
+    @test h.status == :no_key
+    @test h.http_status == 0
+    s = speedtest(Client(api_key=""); n=3)
+    @test s.ok == 0 && s.failed == 3 && s.throughput_rps == 0.0
+
+    io = IOBuffer(); show(io, HealthStatus(true, :ok, 200, 42, "m", "ok"))
+    @test occursin("OK", String(take!(io)))
+    io = IOBuffer(); show(io, SpeedResult(5, 5, 0, 0, 1000, 5.0, 10, 20, 30, "m"))
+    @test occursin("req/s", String(take!(io)))
+end

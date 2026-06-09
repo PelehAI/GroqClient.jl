@@ -22,6 +22,7 @@ include("pricing.jl")
 include("types.jl")
 include("concurrency.jl")
 include("groq.jl")
+include("health.jl")
 
 # ------------------- Public API ---------------------------------------------
 
@@ -30,6 +31,7 @@ export Client, has_key,
        Reply,
        Budget, BudgetExceeded, spent_usd,
        GroqAPIError,
+       HealthStatus, healthcheck, SpeedResult, speedtest,
        chat, chat_async,
        calc_cost, price_for, known_models
 
